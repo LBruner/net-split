@@ -17,9 +17,6 @@ class SubnetMaskPicker extends StatefulWidget {
 }
 
 class SubnetCalculatorScreenState extends State<SubnetMaskPicker> {
-  TextEditingController ipController = TextEditingController(
-    text: "192.168.1.1",
-  );
   double cidr = 24;
 
   String get subnetMask => _calculateMaskFromCIDR(cidr.toInt());
@@ -39,89 +36,68 @@ class SubnetCalculatorScreenState extends State<SubnetMaskPicker> {
     return maskParts.join('.');
   }
 
-  void calculateSubnet() {
-    String ip = ipController.text;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text("Subnet calculated for $ip/$cidr")));
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Endereço de IP:",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          TextField(
-            controller: ipController,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: "Enter IP Address",
-            ),
-          ),
-          SizedBox(height: 20),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 20),
 
-          Text(
-            "Máscara de Subnet: $subnetMask",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
+        Text(
+          "Máscara de Subnet: $subnetMask",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
 
-          Card(
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        "Bits de rede: $networkBits",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Text("Redes: ${pow(2, cidr).toInt()}"),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Text("Host Bits: $hostBits"),
-                      Text("Hosts: $totalHosts"),
-                    ],
-                  ),
-                ],
-              ),
+        Card(
+          elevation: 4,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      "Bits de rede: $networkBits",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    Text("Redes: ${pow(2, cidr).toInt()}"),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Text("Host Bits: $hostBits"),
+                    Text("Hosts: $totalHosts"),
+                  ],
+                ),
+              ],
             ),
           ),
-          Text('Tamanho do Prefixo: '),
-          SfSliderTheme(
-            data: SfSliderThemeData(tooltipBackgroundColor: Colors.red[300]),
-            child: SfSlider(
-              value: cidr,
-              activeColor: Colors.pink,
-              stepSize: 1,
-              showDividers: true,
-              enableTooltip: true,
-              showTicks: true,
-              interval: 8,
-              showLabels: true,
-              minorTicksPerInterval: 7,
-              min: 0,
-              max: 32,
-              onChanged: (value) {
-                setState(() {
-                  cidr = value;
-                });
-                widget.onChangeMask(subnetMask);
-              },
-            ),
+        ),
+        Text('Tamanho do Prefixo: '),
+        SfSliderTheme(
+          data: SfSliderThemeData(tooltipBackgroundColor: Colors.red[300]),
+          child: SfSlider(
+            value: cidr,
+            activeColor: Colors.pink,
+            stepSize: 1,
+            showDividers: true,
+            enableTooltip: true,
+            showTicks: true,
+            interval: 8,
+            showLabels: true,
+            minorTicksPerInterval: 7,
+            min: 0,
+            max: 32,
+            onChanged: (value) {
+              setState(() {
+                cidr = value;
+              });
+              widget.onChangeMask(subnetMask);
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

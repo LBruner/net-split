@@ -14,6 +14,28 @@ class SubnetCalculator {
     return list.join('.');
   }
 
+  int getUsableHosts() {
+    return getTotalHosts() - 2;
+  }
+
+  String getFirstUsableIP() {
+    if (getTotalHosts() <= 2) {
+      return "No usable hosts";
+    }
+    List<int> firstHost = _ipToList(getNetworkAddress());
+    firstHost[3] += 1;
+    return _listToIp(firstHost);
+  }
+
+  String getLastUsableIP() {
+    if (getTotalHosts() <= 2) {
+      return "No usable hosts";
+    }
+    List<int> lastHost = _ipToList(getBroadcastAddress());
+    lastHost[3] -= 1;
+    return _listToIp(lastHost);
+  }
+
   int _ipToInteger(String ip) {
     List<int> parts = _ipToList(ip);
     return (parts[0] << 24) + (parts[1] << 16) + (parts[2] << 8) + parts[3];
@@ -52,7 +74,7 @@ class SubnetCalculator {
     List<int> broadcastParts = _ipToList(getBroadcastAddress());
 
     if (getTotalHosts() <= 2) {
-      return "No usable hosts";
+      return "Nenhum host utilizável";
     }
 
     networkParts[3] += 1;
@@ -65,6 +87,14 @@ class SubnetCalculator {
     List<int> maskParts = _ipToList(mask);
     List<int> wildcardParts = List.generate(4, (i) => 255 - maskParts[i]);
     return _listToIp(wildcardParts);
+  }
+
+  String getFirstBinaryWildcardMask() {
+    List<int> maskParts = _ipToList(mask);
+    String binaryWildcard = maskParts
+        .map((e) => (255 - e).toRadixString(2).padLeft(8, '0'))
+        .join('.');
+    return binaryWildcard;
   }
 
   String getBinarySubnetMask() {
@@ -86,10 +116,10 @@ class SubnetCalculator {
 
   String getIPClass() {
     int firstOctet = _ipToList(ip)[0];
-    if (firstOctet >= 1 && firstOctet <= 126) return "Class A";
-    if (firstOctet >= 128 && firstOctet <= 191) return "Class B";
-    if (firstOctet >= 192 && firstOctet <= 223) return "Class C";
-    if (firstOctet >= 224 && firstOctet <= 239) return "Class D (Multicast)";
+    if (firstOctet >= 1 && firstOctet <= 126) return "Classe A";
+    if (firstOctet >= 128 && firstOctet <= 191) return "Classe B";
+    if (firstOctet >= 192 && firstOctet <= 223) return "Classe C";
+    if (firstOctet >= 224 && firstOctet <= 239) return "Classe D (Multicast)";
     return "Class E (Reserved)";
   }
 
@@ -110,7 +140,7 @@ class SubnetCalculator {
   String getBinaryID() {
     return _ipToList(
       ip,
-    ).map((e) => e.toRadixString(2).padLeft(8, '0')).join('');
+    ).map((e) => e.toRadixString(2).padLeft(8, '0')).join('.');
   }
 
   String getIntegerID() {
@@ -122,7 +152,7 @@ class SubnetCalculator {
   }
 
   String getInAddrArpa() {
-    return _ipToList(ip).reversed.join('.') + ".in-addr.arpa";
+    return "${_ipToList(ip).reversed.join('.')}.in-addr.arpa";
   }
 
   String getIPv4MappedAddress() {
@@ -130,7 +160,6 @@ class SubnetCalculator {
   }
 
   String get6to4Prefix() {
-    List<int> ipParts = _ipToList(ip);
     int intIp = _ipToInteger(ip);
     return "2002:${((intIp >> 16) & 0xFFFF).toRadixString(16)}:${(intIp & 0xFFFF).toRadixString(16)}::/48";
   }

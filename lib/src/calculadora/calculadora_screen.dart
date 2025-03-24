@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:net_split/src/calculadora/calculadora_body.dart';
 import 'package:net_split/src/models/calculadora_model.dart';
-import 'package:net_split/src/widgets/subnet_mask_picker.dart';
 
 class CalculadoraScreen extends StatelessWidget {
   const CalculadoraScreen({super.key});
