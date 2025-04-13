@@ -15,12 +15,13 @@ class SubnetCalculator {
   }
 
   int getUsableHosts() {
-    return getTotalHosts() - 2;
+    final count = getTotalHosts() - 2;
+    return count < 0 ? 0 : count;
   }
 
   String getFirstUsableIP() {
     if (getTotalHosts() <= 2) {
-      return "No usable hosts";
+      return "Nenhum";
     }
     List<int> firstHost = _ipToList(getNetworkAddress());
     firstHost[3] += 1;
@@ -29,7 +30,7 @@ class SubnetCalculator {
 
   String getLastUsableIP() {
     if (getTotalHosts() <= 2) {
-      return "No usable hosts";
+      return "Nenhum";
     }
     List<int> lastHost = _ipToList(getBroadcastAddress());
     lastHost[3] -= 1;
@@ -111,16 +112,19 @@ class SubnetCalculator {
             .split('')
             .where((bit) => bit == '1')
             .length;
+
+    print(prefix);
     return "/$prefix";
   }
 
   String getIPClass() {
     int firstOctet = _ipToList(ip)[0];
     if (firstOctet >= 1 && firstOctet <= 126) return "Classe A";
+    if (firstOctet == 127) return "Loopback";
     if (firstOctet >= 128 && firstOctet <= 191) return "Classe B";
     if (firstOctet >= 192 && firstOctet <= 223) return "Classe C";
     if (firstOctet >= 224 && firstOctet <= 239) return "Classe D (Multicast)";
-    return "Class E (Reserved)";
+    return "Classe E (Reserved)";
   }
 
   String getIPType() {

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:net_split/src/constants.dart';
+import 'package:net_split/src/widgets/UI/cidr_picker.dart';
+import 'package:net_split/src/widgets/UI/custom_text.dart';
 
 class IpPicker extends StatefulWidget {
   final String inputIp;
   final Function(String) onChangeIpAddress;
+
   final String? inputIpError;
 
   const IpPicker({
@@ -92,32 +96,63 @@ class IpPickerState extends State<IpPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      keyboardType: TextInputType.numberWithOptions(decimal: true),
-      controller: _ipController,
-      decoration: InputDecoration(
-        border: const OutlineInputBorder(),
-        errorText: widget.inputIpError,
-        hintText: "Ex: 192.168.1.1",
-      ),
-      onChanged: (value) {
-        final cursorPos = _ipController.selection.base.offset;
-        final formatted = _formatIpAddress(value, cursorPos);
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-        if (formatted != value) {
-          int newCursorPos = cursorPos + (formatted.length - value.length);
-          newCursorPos = newCursorPos.clamp(0, formatted.length);
+    return Column(
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width * 0.56,
+          child: TextField(
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            controller: _ipController,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 17,
+              letterSpacing: 2,
+              color: widget.inputIpError != null ? Colors.red : null,
+            ),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor:
+                  isDark
+                      ? const Color.fromARGB(255, 41, 41, 41)
+                      : const Color.fromARGB(255, 240, 240, 240),
+              border: normalBorder,
+              enabledBorder: normalBorder,
+              focusedBorder:
+                  widget.inputIpError != null ? errorBorder : normalBorder,
+              errorBorder: errorBorder,
+              focusedErrorBorder: errorBorder,
+              hintText: "Ex: 192.168.1.1",
+              hintStyle: TextStyle(
+                color: isDark ? Colors.grey : Colors.grey[600],
+                fontSize: 17,
+              ),
+              errorText: widget.inputIpError,
+              errorStyle: TextStyle(height: 0.8),
+              contentPadding: EdgeInsets.all(12),
+            ),
+            onChanged: (value) {
+              final cursorPos = _ipController.selection.base.offset;
+              final formatted = _formatIpAddress(value, cursorPos);
 
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _ipController.value = TextEditingValue(
-              text: formatted,
-              selection: TextSelection.collapsed(offset: newCursorPos),
-            );
-          });
-        }
+              if (formatted != value) {
+                int newCursorPos =
+                    cursorPos + (formatted.length - value.length);
+                newCursorPos = newCursorPos.clamp(0, formatted.length);
 
-        widget.onChangeIpAddress(formatted);
-      },
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _ipController.value = TextEditingValue(
+                    text: formatted,
+                    selection: TextSelection.collapsed(offset: newCursorPos),
+                  );
+                });
+              }
+              widget.onChangeIpAddress(formatted);
+            },
+          ),
+        ),
+      ],
     );
   }
 }

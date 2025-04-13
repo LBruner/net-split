@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:net_split/src/colors.dart';
+import 'package:net_split/src/widgets/UI/custom_text.dart';
+import 'package:net_split/src/widgets/UI/subnet_row_display.dart';
 import 'dart:math';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
@@ -8,22 +11,32 @@ class SubnetMaskPicker extends StatefulWidget {
     super.key,
     required this.inputMask,
     required this.onChangeMask,
+    required this.cidr,
+    required this.onChangeCidr,
   });
 
   final Function(String newMask) onChangeMask;
   final String inputMask;
+  final int cidr;
+  final Function(int newCidr) onChangeCidr;
   @override
   SubnetCalculatorScreenState createState() => SubnetCalculatorScreenState();
 }
 
 class SubnetCalculatorScreenState extends State<SubnetMaskPicker> {
-  double cidr = 24;
+  @override
+  void initState() {
+    super.initState();
+  }
 
-  String get subnetMask => _calculateMaskFromCIDR(cidr.toInt());
-  int get networkBits => cidr.toInt();
+  String get subnetMask => _calculateMaskFromCIDR(widget.cidr);
+  int get networkBits => widget.cidr.toInt();
   int get hostBits => 32 - networkBits;
-  int get totalHosts =>
-      pow(2, hostBits).toInt() - 2; // Subtracting network & broadcast addresses
+  int get totalHosts {
+    if (widget.cidr == 32) return 1;
+    if (widget.cidr == 31) return 2;
+    return pow(2, hostBits).toInt() - 2;
+  }
 
   String _calculateMaskFromCIDR(int cidr) {
     String binaryMask = '1' * cidr + '0' * (32 - cidr);
@@ -38,48 +51,78 @@ class SubnetCalculatorScreenState extends State<SubnetMaskPicker> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
+      spacing: 6,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 20),
 
-        Text(
-          "Máscara de Subnet: $subnetMask",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Row(
+          children: [
+            CustomText(
+              'Máscara de Subnet: ',
+              color: resultsFontColorDark,
+              fontWeight: FontWeight.w600,
+            ),
+            Text(
+              widget.inputMask,
+              style: TextStyle(fontSize: 16, fontFamily: 'monospace'),
+            ),
+          ],
         ),
-
+        SizedBox(height: MediaQuery.of(context).size.height * 0.004),
         Card(
+          color: isDark ? const Color.fromARGB(255, 41, 41, 41) : Colors.white,
           elevation: 4,
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 20),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  children: [
-                    Text(
-                      "Bits de rede: $networkBits",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Text("Redes: ${pow(2, cidr).toInt()}"),
-                  ],
+                Expanded(
+                  flex: 1,
+                  child: SubnetRowDisplay(
+                    alignment: MainAxisAlignment.start,
+                    topLeftText: 'Bits de Rede: ',
+                    topRightText: networkBits,
+                    bottomLeftText: 'Redes: ',
+                    bottomRightText: pow(2, widget.cidr).toInt(),
+                    lightColor: Colors.redAccent,
+                    darkColor: Colors.redAccent,
+                  ),
                 ),
-                Column(
-                  children: [
-                    Text("Host Bits: $hostBits"),
-                    Text("Hosts: $totalHosts"),
-                  ],
+                Expanded(
+                  flex: 0,
+                  child: SubnetRowDisplay(
+                    alignment: MainAxisAlignment.end,
+                    topLeftText: 'Bits Host: ',
+                    topRightText: hostBits,
+                    bottomLeftText: 'Hosts: ',
+                    bottomRightText: totalHosts,
+                    darkColor: Colors.orangeAccent,
+                    lightColor: Colors.orangeAccent,
+                  ),
                 ),
               ],
             ),
           ),
         ),
-        Text('Tamanho do Prefixo: '),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+        CustomText(
+          'Tamanho do Prefixo: ',
+          color: Colors.blue,
+          fontWeight: FontWeight.w600,
+        ),
         SfSliderTheme(
-          data: SfSliderThemeData(tooltipBackgroundColor: Colors.red[300]),
+          data: SfSliderThemeData(
+            tooltipBackgroundColor: Colors.redAccent,
+            tooltipTextStyle: TextStyle(color: Colors.white),
+          ),
           child: SfSlider(
-            value: cidr,
+            tooltipShape: SfPaddleTooltipShape(),
             activeColor: Colors.pink,
+            inactiveColor: Colors.orangeAccent,
             stepSize: 1,
             showDividers: true,
             enableTooltip: true,
@@ -89,11 +132,14 @@ class SubnetCalculatorScreenState extends State<SubnetMaskPicker> {
             minorTicksPerInterval: 7,
             min: 0,
             max: 32,
+            value: widget.cidr.toDouble(),
             onChanged: (value) {
-              setState(() {
-                cidr = value;
-              });
-              widget.onChangeMask(subnetMask);
+              if (value == 0) return;
+              final int newCidr = value.toInt();
+              // Calculate mask with the NEW cidr value, not the old one
+              String newMask = _calculateMaskFromCIDR(newCidr);
+              widget.onChangeMask(newMask);
+              widget.onChangeCidr(newCidr);
             },
           ),
         ),

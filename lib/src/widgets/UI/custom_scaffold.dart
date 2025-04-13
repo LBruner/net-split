@@ -6,7 +6,6 @@ import 'package:net_split/src/widgets/UI/theme_selector_button.dart';
 class CustomScaffold extends StatelessWidget {
   const CustomScaffold({
     super.key,
-    required this.hint,
     required this.body,
     this.fab,
     this.labels,
@@ -14,14 +13,15 @@ class CustomScaffold extends StatelessWidget {
     this.showBackButton = false,
     this.press,
     this.controller,
+    this.title,
   });
 
   final Widget body;
   final Widget? fab;
-  final String hint;
   final Function()? iconPress;
   final Function()? press;
   final Widget? labels;
+  final String? title;
   final bool showBackButton;
   final TextEditingController? controller;
 
@@ -31,8 +31,12 @@ class CustomScaffold extends StatelessWidget {
 
     return Scaffold(
       key: scaffoldKey,
+
       appBar: AppBar(
-        title: CustomText('NetSlip'),
+        title:
+            title != null
+                ? CustomText(title!, fontWeight: FontWeight.bold)
+                : null,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -40,7 +44,6 @@ class CustomScaffold extends StatelessWidget {
           ),
         ],
       ),
-      drawer: Drawer(),
       body: Padding(
         padding: const EdgeInsets.all(kDefaultPadding),
         child: SingleChildScrollView(child: body),

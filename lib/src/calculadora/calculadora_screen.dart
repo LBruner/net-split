@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:net_split/src/calculadora/calculadora_body.dart';
-import 'package:net_split/src/models/calculadora_model.dart';
 
-class CalculadoraScreen extends StatelessWidget {
+class CalculadoraScreen extends StatefulWidget {
   const CalculadoraScreen({super.key});
 
   @override
+  State<CalculadoraScreen> createState() => _CalculadoraScreenState();
+}
+
+class _CalculadoraScreenState extends State<CalculadoraScreen> {
+  @override
   Widget build(BuildContext context) {
-    var subnet = SubnetCalculator("192.168.1.10", "255.255.255.0");
-    subnet.printAll();
     return CalculadoraBody();
   }
 }

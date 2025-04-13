@@ -51,7 +51,7 @@ final darkTheme = ThemeData(
 final lightTheme = ThemeData(
   primaryColor: primaryColor,
   brightness: Brightness.light,
-  scaffoldBackgroundColor: bgColorLight,
+  scaffoldBackgroundColor: Color.fromRGBO(248, 250, 252, 1),
   inputDecorationTheme: const InputDecorationTheme(
     fillColor: secondaryColorLight,
   ),
@@ -68,7 +68,7 @@ final lightTheme = ThemeData(
   textTheme: GoogleFonts.poppinsTextTheme().apply(bodyColor: Colors.black),
   colorScheme: ColorScheme.fromSwatch(
     primarySwatch: Colors.grey,
-  ).copyWith(surface: bgColorLight),
+  ).copyWith(surface: Color.fromRGBO(248, 250, 252, 1)),
 );
 
 OutlineInputBorder outlineInputBorder(BuildContext context) {
