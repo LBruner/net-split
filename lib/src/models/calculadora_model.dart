@@ -113,7 +113,6 @@ class SubnetCalculator {
             .where((bit) => bit == '1')
             .length;
 
-    print(prefix);
     return "/$prefix";
   }
 

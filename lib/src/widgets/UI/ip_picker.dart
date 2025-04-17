@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:net_split/src/constants.dart';
-import 'package:net_split/src/widgets/UI/cidr_picker.dart';
-import 'package:net_split/src/widgets/UI/custom_text.dart';
 
 class IpPicker extends StatefulWidget {
   final String inputIp;
