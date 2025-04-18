@@ -67,7 +67,7 @@ class SubnetCalculatorScreenState extends State<SubnetMaskPicker> {
               fontWeight: FontWeight.w600,
             ),
             Text(
-              widget.inputMask,
+              _calculateMaskFromCIDR(widget.cidr),
               style: TextStyle(fontSize: 16, fontFamily: 'monospace'),
             ),
           ],
