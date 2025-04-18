@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
                 themeController.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
             home: CustomScaffold(
               body: CalculadoraScreen(),
-              title: 'Subnet Calculator',
+              title: 'Calculadora Subnet',
             ),
           );
         },
